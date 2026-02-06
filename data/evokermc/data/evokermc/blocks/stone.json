@@ -1,0 +1,16 @@
+{
+  "id": "evokermc:stone",
+  "name": "Stone",
+  "properties": {
+    "hardness": 1.5,
+    "resistance": 6.0,
+    "solid": true,
+    "opaque": true,
+    "replaceable": false,
+    "light_level": 0
+  },
+  "textures": {
+    "all": "blocks/stone"
+  },
+  "loot_table": "evokermc:blocks/stone"
+}

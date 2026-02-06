@@ -1,0 +1,78 @@
+[package]
+name = "evokermc"
+version = "0.1.0"
+edition = "2021"
+authors = ["EvokerMC Contributors"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/evokerking1/EvokerMC"
+
+[dependencies]
+evoker-core = { path = "evoker-core" }
+evoker-world = { path = "evoker-world" }
+evoker-network = { path = "evoker-network" }
+evoker-modding = { path = "evoker-modding" }
+evoker-scripting = { path = "evoker-scripting" }
+evoker-ui = { path = "evoker-ui" }
+evoker-assets = { path = "evoker-assets" }
+evoker-compat = { path = "evoker-compat" }
+
+tokio = { workspace = true }
+anyhow = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
+
+[workspace]
+members = [
+    "evoker-core",
+    "evoker-world",
+    "evoker-network",
+    "evoker-modding",
+    "evoker-scripting",
+    "evoker-ui",
+    "evoker-assets",
+    "evoker-compat",
+    "evoker-registry"
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["EvokerMC Contributors"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/evokerking1/EvokerMC"
+
+[workspace.dependencies]
+# Core dependencies
+tokio = { version = "1.41", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
+env_logger = "0.11"
+
+# Async runtime
+async-trait = "0.1"
+
+# Networking
+quinn = "0.11"
+
+# Scripting
+mlua = { version = "0.9", features = ["lua54", "async", "send", "vendored"] }
+pyo3 = { version = "0.21", features = ["auto-initialize"] }
+
+# Modding
+wasmtime = "25.0"
+zip = "2.2"
+
+# UI
+egui = "0.29"
+winit = "0.30"
+
+# Graphics (for future 3D rendering)
+wgpu = "23.0"
+
+# Data structures
+dashmap = "6.1"
+parking_lot = "0.12"

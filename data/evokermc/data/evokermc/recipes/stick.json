@@ -1,0 +1,15 @@
+{
+  "id": "evokermc:stick",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": { "item": "evokermc:oak_planks" }
+  },
+  "result": {
+    "item": "evokermc:stick",
+    "count": 4
+  }
+}
