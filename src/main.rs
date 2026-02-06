@@ -98,32 +98,39 @@ impl App {
     pub async fn start_singleplayer(&mut self, world_name: String) -> anyhow::Result<()> {
         log::info!("Starting singleplayer with integrated server");
         
-        // Start integrated server
+        // Start integrated server on random port
         let server = Arc::new(Server::new(
             0, // Random port for integrated server
             1, // Single player
             self.event_bus.clone(),
         ));
         server.start().await?;
+        
+        // Get the actual address the server is listening on
+        let server_addr = server.local_addr()
+            .ok_or_else(|| anyhow::anyhow!("Server did not bind to an address"))?;
+        
+        log::info!("Integrated server started on {}", server_addr);
+        
         self.integrated_server = Some(server.clone());
         
         // Create client and connect to integrated server
         let client = Arc::new(Client::new(self.event_bus.clone()));
-        client.connect("localhost:0".to_string()).await?;
+        client.connect(server_addr.to_string()).await?;
         self.client = Some(client);
         
         // Load or create world
         let world_path = PathBuf::from("worlds");
         let world = Arc::new(World::load(
             world_name.clone(),
-            world_path,
+            world_path.clone(),
             self.event_bus.clone(),
         ).await.or_else(|_| {
             // Create new world if load fails
             World::new(
                 world_name,
                 12345, // Default seed
-                PathBuf::from("worlds"),
+                world_path,
                 self.event_bus.clone(),
             )
         })?);
@@ -235,10 +242,15 @@ impl App {
         // Load mods
         self.load_mods().await?;
         
-        // Main game loop would go here
-        // For now, this is just a placeholder
+        // Main application loop
+        // In a full implementation, this would:
+        // - Initialize window and graphics
+        // - Run event loop
+        // - Render frames
+        // - Process input
+        // - Update game state
         
-        log::info!("EvokerMC running");
+        log::info!("EvokerMC initialized and ready");
         
         Ok(())
     }

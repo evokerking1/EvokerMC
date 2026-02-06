@@ -58,6 +58,9 @@ async-trait = "0.1"
 # Networking
 quinn = "0.11"
 
+# UUID generation
+uuid = { version = "1.11", features = ["v4"] }
+
 # Scripting
 mlua = { version = "0.9", features = ["lua54", "async", "send", "vendored"] }
 pyo3 = { version = "0.21", features = ["auto-initialize"] }
@@ -76,3 +79,6 @@ wgpu = "23.0"
 # Data structures
 dashmap = "6.1"
 parking_lot = "0.12"
+
+# Noise generation
+noise = "0.9"

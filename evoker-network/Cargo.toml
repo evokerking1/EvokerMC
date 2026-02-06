@@ -16,3 +16,6 @@ log = { workspace = true }
 quinn = { workspace = true }
 dashmap = { workspace = true }
 parking_lot = { workspace = true }
+rustls = { version = "0.23", default-features = false }
+rcgen = "0.13"
+uuid = { workspace = true }

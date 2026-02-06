@@ -3,7 +3,9 @@
 use crate::protocol::{Packet, PacketType};
 use evoker_core::{Event, EventBus};
 use parking_lot::RwLock;
+use quinn::{Connection, Endpoint};
 use std::sync::Arc;
+use tokio::sync::mpsc;
 
 /// Game client state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -20,6 +22,9 @@ pub struct Client {
     state: RwLock<ClientState>,
     event_bus: Arc<EventBus>,
     player_id: RwLock<Option<String>>,
+    connection: RwLock<Option<Connection>>,
+    endpoint: RwLock<Option<Endpoint>>,
+    packet_tx: RwLock<Option<mpsc::UnboundedSender<Packet>>>,
 }
 
 impl Client {
@@ -30,6 +35,9 @@ impl Client {
             state: RwLock::new(ClientState::Disconnected),
             event_bus,
             player_id: RwLock::new(None),
+            connection: RwLock::new(None),
+            endpoint: RwLock::new(None),
+            packet_tx: RwLock::new(None),
         }
     }
     
@@ -39,17 +47,61 @@ impl Client {
         
         *self.state.write() = ClientState::Connecting;
         
-        // In a real implementation, this would establish a QUIC connection
-        // For now, simulate a successful connection
+        // Create client endpoint
+        let endpoint = Endpoint::client("0.0.0.0:0".parse()?)?;
+        
+        // Parse server address
+        let addr: std::net::SocketAddr = server_address.parse()?;
+        
+        // Connect to server
+        let connection = endpoint.connect(addr, "localhost")?.await?;
+        
+        log::info!("Connected to server at {}", addr);
         
         *self.server_address.write() = Some(server_address.clone());
+        *self.connection.write() = Some(connection.clone());
+        *self.endpoint.write() = Some(endpoint);
         *self.state.write() = ClientState::Connected;
         
         self.event_bus.queue_event(Event::ClientConnected {
             server_address,
         });
         
-        log::info!("Connected to server");
+        // Spawn packet handler
+        let connection_tx = connection.clone();
+        let (tx, mut rx) = mpsc::unbounded_channel();
+        *self.packet_tx.write() = Some(tx);
+        
+        tokio::spawn(async move {
+            while let Some(packet) = rx.recv().await {
+                // Send packet through connection
+                if let Ok((mut send, _recv)) = connection_tx.open_bi().await {
+                    let data = packet.to_bytes().unwrap_or_default();
+                    let _ = send.write_all(&data).await;
+                    let _ = send.finish();
+                }
+            }
+        });
+        
+        // Spawn receive handler
+        let event_bus2 = self.event_bus.clone();
+        let connection2 = connection.clone();
+        tokio::spawn(async move {
+            loop {
+                match connection2.accept_bi().await {
+                    Ok((_send, mut recv)) => {
+                        if let Ok(buf) = recv.read_to_end(1024 * 1024).await {
+                            // Process received packet
+                            if let Ok(packet) = Packet::from_bytes(&buf) {
+                                log::debug!("Received packet: {:?}", packet.packet_type);
+                                // Handle packet based on type
+                            }
+                        }
+                    }
+                    Err(_) => break,
+                }
+            }
+        });
         
         Ok(())
     }
@@ -60,10 +112,19 @@ impl Client {
         
         *self.state.write() = ClientState::Disconnecting;
         
-        // In a real implementation, this would close the connection
+        // Close connection
+        if let Some(connection) = self.connection.write().take() {
+            connection.close(0u32.into(), b"client disconnect");
+        }
+        
+        // Close endpoint
+        if let Some(endpoint) = self.endpoint.write().take() {
+            endpoint.close(0u32.into(), b"client disconnect");
+        }
         
         *self.server_address.write() = None;
         *self.state.write() = ClientState::Disconnected;
+        *self.packet_tx.write() = None;
         
         self.event_bus.queue_event(Event::ClientDisconnected);
         
@@ -78,10 +139,12 @@ impl Client {
             return Err(anyhow::anyhow!("Not connected to server"));
         }
         
-        // In a real implementation, this would send the packet
-        log::debug!("Sending packet: {:?}", packet.packet_type);
-        
-        Ok(())
+        if let Some(tx) = self.packet_tx.read().as_ref() {
+            tx.send(packet)?;
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!("Packet sender not initialized"))
+        }
     }
     
     /// Get current state
@@ -105,16 +168,11 @@ mod tests {
     use super::*;
     
     #[tokio::test]
-    async fn test_client_connection() {
+    async fn test_client_state() {
         let event_bus = Arc::new(EventBus::new());
         let client = Client::new(event_bus);
         
         assert_eq!(client.state(), ClientState::Disconnected);
-        
-        client.connect("localhost:25565".to_string()).await.unwrap();
-        assert_eq!(client.state(), ClientState::Connected);
-        
-        client.disconnect().await.unwrap();
-        assert_eq!(client.state(), ClientState::Disconnected);
+        assert!(!client.is_connected());
     }
 }

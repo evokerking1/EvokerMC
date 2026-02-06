@@ -103,8 +103,26 @@ impl Game {
     
     /// Single game tick
     async fn tick(&self) -> anyhow::Result<()> {
-        // This is where the game logic would run each tick
-        // For now, it's just a placeholder
+        // Process events from event queue
+        self.event_bus.process_queue().await?;
+        
+        // Update game state based on current state
+        match self.state() {
+            GameState::Running => {
+                // Game logic updates would go here:
+                // - Update entities
+                // - Process player input
+                // - Update physics
+                // - Update AI
+                // - Check for collisions
+                // - Update world state
+            }
+            GameState::Paused => {
+                // Only process essential updates when paused
+            }
+            _ => {}
+        }
+        
         Ok(())
     }
     

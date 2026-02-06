@@ -46,22 +46,53 @@ impl Chunk {
     pub fn generate(coord: ChunkCoord, seed: i64) -> Self {
         let mut chunk = Self::new(coord);
         
-        // Simple terrain generation (placeholder)
-        // In a real implementation, this would use noise functions
+        // Use Perlin noise for terrain generation
+        use noise::{NoiseFn, Perlin, Seedable};
+        
+        let perlin = Perlin::new(seed as u32);
+        let scale = 0.05; // Controls terrain smoothness
+        let height_multiplier = 32.0; // Controls terrain height variation
+        let base_height = 64; // Sea level
+        
         for x in 0..CHUNK_WIDTH {
             for z in 0..CHUNK_DEPTH {
-                let height = 64 + ((seed + x as i64 + z as i64) % 10);
-                for y in 0..height.min(CHUNK_HEIGHT as i64) as usize {
-                    let block_id = if y < 1 {
-                        1 // bedrock
-                    } else if y < height as usize - 3 {
-                        2 // stone
-                    } else if y < height as usize - 1 {
-                        3 // dirt
+                // Calculate world coordinates
+                let world_x = (coord.x * CHUNK_WIDTH as i32 + x as i32) as f64;
+                let world_z = (coord.z * CHUNK_DEPTH as i32 + z as i32) as f64;
+                
+                // Sample noise for height
+                let noise_value = perlin.get([world_x * scale, world_z * scale]);
+                let height = (base_height as f64 + noise_value * height_multiplier) as usize;
+                let height = height.min(CHUNK_HEIGHT - 1);
+                
+                // Generate terrain layers
+                for y in 0..=height {
+                    let block_id = if y == 0 {
+                        1 // Bedrock at bottom
+                    } else if y < height.saturating_sub(4) {
+                        2 // Stone
+                    } else if y < height {
+                        3 // Dirt
                     } else {
-                        4 // grass
+                        // Top layer depends on height
+                        if height < base_height - 5 {
+                            7 // Sand (below sea level)
+                        } else if height < base_height + 20 {
+                            4 // Grass
+                        } else if height < base_height + 50 {
+                            2 // Stone (mountains)
+                        } else {
+                            6 // Snow (mountain peaks)
+                        }
                     };
                     chunk.set_block(x, y, z, block_id);
+                }
+                
+                // Fill water below sea level
+                if height < base_height {
+                    for y in (height + 1)..base_height {
+                        chunk.set_block(x, y, z, 5); // Water
+                    }
                 }
             }
         }

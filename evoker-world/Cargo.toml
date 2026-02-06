@@ -16,3 +16,4 @@ log = { workspace = true }
 dashmap = { workspace = true }
 parking_lot = { workspace = true }
 chrono = "0.4"
+noise = { workspace = true }

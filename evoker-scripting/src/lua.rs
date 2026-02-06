@@ -1,6 +1,6 @@
 //! Lua scripting engine
 
-use mlua::{Lua, Result as LuaResult};
+use mlua::Lua;
 use std::sync::Arc;
 
 /// Lua script engine
@@ -29,10 +29,11 @@ impl LuaScriptEngine {
         self.execute(&script).await
     }
     
-    /// Register function
-    pub fn register_function<F>(&self, name: &str, func: F) -> anyhow::Result<()>
+    /// Register Rust function callable from Lua
+    pub fn register_function<'a, A, R>(&self, name: &str, func: mlua::Function<'a>) -> anyhow::Result<()>
     where
-        F: mlua::Function<'static>,
+        A: mlua::FromLuaMulti<'a>,
+        R: mlua::IntoLuaMulti<'a>,
     {
         self.lua.globals().set(name, func)?;
         Ok(())
