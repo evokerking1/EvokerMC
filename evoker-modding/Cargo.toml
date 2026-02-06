@@ -17,3 +17,4 @@ wasmtime = { workspace = true }
 zip = { workspace = true }
 dashmap = { workspace = true }
 parking_lot = { workspace = true }
+jni = { workspace = true }

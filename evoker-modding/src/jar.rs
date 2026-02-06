@@ -1,17 +1,19 @@
 //! JAR mod support
 //! 
-//! Loads Java-based mods from JAR files. Uses metadata extraction
-//! for mod discovery. Full JVM integration would require JNI.
+//! Loads Java-based mods from JAR files using JNI integration.
 
+use crate::jvm::{JvmManager, JavaMod};
 use std::path::Path;
 use std::fs::File;
 use std::io::Read;
 use zip::ZipArchive;
 
-/// JAR mod loader
+/// JAR mod loader with JNI integration
 pub struct JarModLoader {
     // Stores loaded JAR metadata
     loaded_jars: Vec<JarModMetadata>,
+    // Store Java mod instances
+    java_mods: Vec<JavaMod>,
 }
 
 /// Metadata extracted from JAR
@@ -27,10 +29,11 @@ impl JarModLoader {
     pub fn new() -> Self {
         Self {
             loaded_jars: Vec::new(),
+            java_mods: Vec::new(),
         }
     }
     
-    /// Load JAR mod
+    /// Load JAR mod with full JNI integration
     pub async fn load(&mut self, path: &Path) -> anyhow::Result<()> {
         log::info!("Loading JAR mod from: {:?}", path);
         
@@ -41,16 +44,45 @@ impl JarModLoader {
         // Extract metadata from mod.json or META-INF/MANIFEST.MF
         let metadata = self.extract_metadata(&mut archive)?;
         
-        log::info!("Loaded JAR mod: {} v{}", metadata.name, metadata.version);
+        log::info!("Loaded JAR mod metadata: {} v{}", metadata.name, metadata.version);
+        
+        // Try to initialize JVM and load the mod
+        // If JVM is not available, just store the metadata
+        if let Some(jvm) = JvmManager::get() {
+            // Load the JAR into the JVM classpath
+            jvm.load_jar(path)?;
+            
+            // If there's a main class, instantiate it
+            if let Some(ref main_class) = metadata.main_class {
+                log::info!("Instantiating main class: {}", main_class);
+                
+                // Convert Java class name format (com.example.Mod) to JNI format (com/example/Mod)
+                let jni_class_name = main_class.replace('.', "/");
+                
+                match jvm.new_instance(&jni_class_name) {
+                    Ok(instance) => {
+                        let java_mod = JavaMod::new(main_class.clone(), instance);
+                        
+                        // Initialize the mod
+                        java_mod.init()?;
+                        
+                        self.java_mods.push(java_mod);
+                        log::info!("Java mod instantiated and initialized: {}", main_class);
+                    }
+                    Err(e) => {
+                        log::error!("Failed to instantiate mod class {}: {}", main_class, e);
+                        return Err(e);
+                    }
+                }
+            } else {
+                log::warn!("No main class specified in JAR metadata");
+            }
+        } else {
+            log::warn!("JVM not initialized - JAR mod loaded but not instantiated");
+            log::warn!("To use Java mods, ensure a JDK is installed and initialize the JVM");
+        }
         
         self.loaded_jars.push(metadata);
-        
-        // Note: Full JVM integration would require:
-        // 1. Initialize JVM using jni crate
-        // 2. Load JAR classes into JVM
-        // 3. Instantiate mod main class
-        // 4. Call mod initialization methods
-        // This is a foundation for future JNI integration
         
         Ok(())
     }
@@ -114,6 +146,11 @@ impl JarModLoader {
     pub fn loaded_mods(&self) -> &[JarModMetadata] {
         &self.loaded_jars
     }
+    
+    /// Get Java mod instances
+    pub fn java_mods(&self) -> &[JavaMod] {
+        &self.java_mods
+    }
 }
 
 impl Default for JarModLoader {
@@ -130,5 +167,6 @@ mod tests {
     async fn test_jar_loader_creation() {
         let loader = JarModLoader::new();
         assert_eq!(loader.loaded_mods().len(), 0);
+        assert_eq!(loader.java_mods().len(), 0);
     }
 }

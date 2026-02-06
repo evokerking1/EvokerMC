@@ -25,11 +25,13 @@ EvokerMC is a highly moddable, data-driven 3D block game engine inspired by Mine
 - **Server-Authoritative**: All game logic runs on server
 
 ### 4. Modding System (`evoker-modding`)
-- **JAR Mod Loader**: Support for Java-based mods
+- **JAR Mod Loader**: Support for Java-based mods with full JNI integration
 - **WASM Mod Loader**: Secure WebAssembly mod execution
 - **Mod Discovery**: Automatic mod detection and loading
 - **Dependency Resolution**: Topological sort for mod dependencies
 - **Mod API**: Clean API for mod interaction
+- **JVM Manager**: Manages Java Virtual Machine lifecycle for Java mods
+- **Java Mod Instances**: Create and manage Java mod objects via JNI
 
 ### 5. Scripting (`evoker-scripting`)
 - **Lua Support**: Lua 5.4 scripting engine with async support

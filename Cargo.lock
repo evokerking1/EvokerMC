@@ -1032,6 +1032,7 @@ dependencies = [
  "anyhow",
  "dashmap",
  "evoker-core",
+ "jni",
  "log",
  "parking_lot",
  "serde",
