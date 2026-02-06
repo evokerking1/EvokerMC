@@ -1,0 +1,21 @@
+{
+  "id": "evokermc:grass_block",
+  "name": "Grass Block",
+  "properties": {
+    "hardness": 0.6,
+    "resistance": 0.6,
+    "solid": true,
+    "opaque": true,
+    "replaceable": false,
+    "light_level": 0
+  },
+  "textures": {
+    "top": "blocks/grass_top",
+    "bottom": "blocks/dirt",
+    "north": "blocks/grass_side",
+    "south": "blocks/grass_side",
+    "east": "blocks/grass_side",
+    "west": "blocks/grass_side"
+  },
+  "loot_table": "evokermc:blocks/grass_block"
+}

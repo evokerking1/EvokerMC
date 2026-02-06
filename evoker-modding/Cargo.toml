@@ -1,0 +1,20 @@
+[package]
+name = "evoker-modding"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+evoker-core = { path = "../evoker-core" }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+wasmtime = { workspace = true }
+zip = { workspace = true }
+dashmap = { workspace = true }
+parking_lot = { workspace = true }
+jni = { workspace = true }

@@ -1,0 +1,68 @@
+{
+  "title": "EvokerMC Documentation",
+  "description": "A highly moddable 3D block game engine",
+  "version": "0.1.0",
+  "theme": "dark",
+  "logo": "/assets/logo.png",
+  "nav": [
+    {
+      "title": "Getting Started",
+      "items": [
+        { "title": "Introduction", "path": "/introduction" },
+        { "title": "Installation", "path": "/installation" },
+        { "title": "Quick Start", "path": "/quick-start" }
+      ]
+    },
+    {
+      "title": "Architecture",
+      "items": [
+        { "title": "Overview", "path": "/architecture/overview" },
+        { "title": "Server-Authoritative Design", "path": "/architecture/server-authoritative" },
+        { "title": "Integrated Server", "path": "/architecture/integrated-server" },
+        { "title": "Event System", "path": "/architecture/events" }
+      ]
+    },
+    {
+      "title": "Core Systems",
+      "items": [
+        { "title": "World Management", "path": "/core/world" },
+        { "title": "Networking", "path": "/core/networking" },
+        { "title": "UI System", "path": "/core/ui" }
+      ]
+    },
+    {
+      "title": "Modding",
+      "items": [
+        { "title": "Mod Development", "path": "/modding/development" },
+        { "title": "JAR Mods", "path": "/modding/jar" },
+        { "title": "WASM Mods", "path": "/modding/wasm" },
+        { "title": "Scripting", "path": "/modding/scripting" },
+        { "title": "Forge Compatibility", "path": "/modding/forge" },
+        { "title": "Neoforge Compatibility", "path": "/modding/neoforge" }
+      ]
+    },
+    {
+      "title": "Asset Editor",
+      "items": [
+        { "title": "Overview", "path": "/assets/overview" },
+        { "title": "Creating Assets", "path": "/assets/creating" },
+        { "title": "Asset Types", "path": "/assets/types" }
+      ]
+    },
+    {
+      "title": "API Reference",
+      "items": [
+        { "title": "Rust API", "path": "/api/rust", "external": true },
+        { "title": "Mod API", "path": "/api/mod" },
+        { "title": "Scripting API", "path": "/api/scripting" }
+      ]
+    }
+  ],
+  "footer": {
+    "links": [
+      { "title": "GitHub", "url": "https://github.com/evokerking1/EvokerMC" },
+      { "title": "Discord", "url": "#" },
+      { "title": "License", "url": "/license" }
+    ]
+  }
+}

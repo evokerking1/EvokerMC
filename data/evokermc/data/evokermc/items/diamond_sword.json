@@ -1,0 +1,12 @@
+{
+  "id": "evokermc:diamond_sword",
+  "name": "Diamond Sword",
+  "description": ["A powerful melee weapon", "made from diamonds"],
+  "properties": {
+    "max_stack_size": 1,
+    "max_durability": 1561,
+    "fire_resistant": false,
+    "rarity": "rare"
+  },
+  "texture": "items/diamond_sword"
+}
