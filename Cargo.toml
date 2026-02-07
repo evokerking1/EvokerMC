@@ -66,7 +66,7 @@ jni = "0.21"
 
 # Scripting
 mlua = { version = "0.9", features = ["lua54", "async", "send", "vendored"] }
-pyo3 = { version = "0.21", features = ["auto-initialize"] }
+pyo3 = { version = "0.28.0", features = ["auto-initialize"] }
 
 # Modding
 wasmtime = "25.0"
