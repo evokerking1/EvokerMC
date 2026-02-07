@@ -1,25 +1,43 @@
 //! Python scripting engine
 
 use pyo3::prelude::*;
-use pyo3::types::PyModule;
+use pyo3::types::{PyModule, PyDict};
+use std::sync::Arc;
+use crate::api::ScriptApi;
 
 /// Python script engine
 pub struct PythonScriptEngine {
-    // Python interpreter is global
+    script_api: Arc<ScriptApi>,
 }
 
 impl PythonScriptEngine {
     /// Create a new Python engine
-    pub fn new() -> anyhow::Result<Self> {
-        Ok(Self {})
+    pub fn new(script_api: Arc<ScriptApi>) -> anyhow::Result<Self> {
+        Ok(Self { script_api })
     }
     
     /// Execute Python script
     pub async fn execute(&self, script: &str) -> anyhow::Result<()> {
         Python::with_gil(|py| {
-            py.run(script, None, None)?;
+            // Create a game module with API bindings
+            let game_module = PyModule::new_bound(py, "game")?;
+            
+            // Add logging functions as module functions
+            game_module.add_function(wrap_pyfunction!(py_log, &game_module)?)?;
+            game_module.add_function(wrap_pyfunction!(py_debug, &game_module)?)?;
+            game_module.add_function(wrap_pyfunction!(py_warn, &game_module)?)?;
+            game_module.add_function(wrap_pyfunction!(py_error, &game_module)?)?;
+            
+            // Add to sys.modules so it can be imported
+            let sys = PyModule::import_bound(py, "sys")?;
+            let sys_modules = sys.getattr("modules")?;
+            sys_modules.set_item("game", game_module)?;
+            
+            // Execute the script
+            py.run_bound(script, None, None)?;
             Ok::<(), PyErr>(())
         })?;
+        
         Ok(())
     }
     
@@ -32,27 +50,61 @@ impl PythonScriptEngine {
     /// Import and execute Python module
     pub fn import_module(&self, name: &str) -> anyhow::Result<()> {
         Python::with_gil(|py| {
-            let _module = PyModule::import(py, name)?;
+            let _module = PyModule::import_bound(py, name)?;
             Ok::<(), PyErr>(())
         })?;
         Ok(())
     }
 }
 
-impl Default for PythonScriptEngine {
-    fn default() -> Self {
-        Self::new().expect("Failed to create Python engine")
-    }
+// Python wrapper functions for the ScriptApi
+// Note: These are simplified - in a full implementation, they would
+// properly access the ScriptApi through thread-local storage or similar mechanism
+
+#[pyfunction]
+fn py_log(msg: String) {
+    log::info!("[Script] {}", msg);
+}
+
+#[pyfunction]
+fn py_debug(msg: String) {
+    log::debug!("[Script] {}", msg);
+}
+
+#[pyfunction]
+fn py_warn(msg: String) {
+    log::warn!("[Script] {}", msg);
+}
+
+#[pyfunction]
+fn py_error(msg: String) {
+    log::error!("[Script] {}", msg);
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use evoker_core::EventBus;
     
     #[tokio::test]
     async fn test_python_execution() {
-        let engine = PythonScriptEngine::new().unwrap();
+        let event_bus = Arc::new(EventBus::new());
+        let script_api = Arc::new(ScriptApi::new(event_bus));
+        let engine = PythonScriptEngine::new(script_api).unwrap();
         let result = engine.execute("x = 1 + 1").await;
+        assert!(result.is_ok());
+    }
+    
+    #[tokio::test]
+    async fn test_python_api_access() {
+        let event_bus = Arc::new(EventBus::new());
+        let script_api = Arc::new(ScriptApi::new(event_bus));
+        let engine = PythonScriptEngine::new(script_api).unwrap();
+        let script = r#"
+import game
+game.py_log("Hello from Python!")
+"#;
+        let result = engine.execute(script).await;
         assert!(result.is_ok());
     }
 }

@@ -15,3 +15,4 @@ thiserror = { workspace = true }
 log = { workspace = true }
 mlua = { workspace = true }
 pyo3 = { workspace = true }
+uuid = { workspace = true }

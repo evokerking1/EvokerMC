@@ -1006,6 +1006,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
+ "toml",
  "zip",
 ]
 
@@ -1039,6 +1040,7 @@ dependencies = [
  "serde_json",
  "thiserror 1.0.69",
  "tokio",
+ "uuid",
  "wasmtime",
  "zip",
 ]
@@ -1090,6 +1092,7 @@ dependencies = [
  "serde_json",
  "thiserror 1.0.69",
  "tokio",
+ "uuid",
 ]
 
 [[package]]
