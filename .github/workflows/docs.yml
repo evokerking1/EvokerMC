@@ -34,7 +34,10 @@ jobs:
         node-version: '20'
     
     - name: Install Zensical
-      run: npm install -g zensical
+      run: | 
+           python3 -m venv .venv
+           source .venv/bin/activate
+           pip install zensical
     
     - name: Create documentation site structure
       run: |
