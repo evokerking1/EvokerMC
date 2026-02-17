@@ -100,26 +100,27 @@ mod tests {
     
     #[test]
     fn test_shaped_recipe_parse() {
-        // Use concat! to avoid Rust 2021 prefix syntax issues in rustdoc
-        let json = concat!(
-            r#"{"#,
-            r#"    "id": "minecraft"#, ":", r#"stick","#,
-            r#"    "type": "minecraft"#, ":", r#"crafting_shaped","#,
-            r#"    "pattern": ["#,
-            r#"        "#","#,
-            r#"        "#""#,
-            r#"    ],"#,
-            r#"    "key": {"#,
-            r#"        "#": { "item": "minecraft"#, ":", r#"oak_planks" }"#,
-            r#"    },"#,
-            r#"    "result": {"#,
-            r#"        "item": "minecraft"#, ":", r#"stick","#,
-            r#"        "count": 4"#,
-            r#"    }"#,
-            r#"}"#
+        // Use format! with r## to avoid Rust 2021 prefix syntax issues in rustdoc
+        let json = format!(
+            r##"{{
+    "id": "minecraft{}stick",
+    "type": "minecraft{}crafting_shaped",
+    "pattern": [
+        "#",
+        "#"
+    ],
+    "key": {{
+        "#": {{ "item": "minecraft{}oak_planks" }}
+    }},
+    "result": {{
+        "item": "minecraft{}stick",
+        "count": 4
+    }}
+}}"##,
+            ":", ":", ":", ":"
         );
         
-        let recipe = RecipeDefinition::from_json(json).unwrap();
+        let recipe = RecipeDefinition::from_json(&json).unwrap();
         assert_eq!(recipe.id, "minecraft:stick");
     }
 }
