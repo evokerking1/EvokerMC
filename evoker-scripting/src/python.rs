@@ -36,7 +36,7 @@ impl PythonScriptEngine {
             
             // Execute the script
             // Convert the script to a CString for the new PyO3 API
-            let code_cstr = CString::new(script).map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Invalid script: {}", e)))?;
+            let code_cstr = CString::new(script).map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Script contains null byte: {}", e)))?;
             py.run(code_cstr.as_c_str(), None, None)?;
             Ok::<(), PyErr>(())
         })?;
