@@ -1,8 +1,9 @@
 //! Python scripting engine
 
 use pyo3::prelude::*;
-use pyo3::types::{PyModule, PyDict};
+use pyo3::types::PyModule;
 use std::sync::Arc;
+use std::ffi::CString;
 use crate::api::ScriptApi;
 
 /// Python script engine
@@ -18,9 +19,9 @@ impl PythonScriptEngine {
     
     /// Execute Python script
     pub async fn execute(&self, script: &str) -> anyhow::Result<()> {
-        Python::with_gil(|py| {
+        Python::attach(|py| {
             // Create a game module with API bindings
-            let game_module = PyModule::new_bound(py, "game")?;
+            let game_module = PyModule::new(py, "game")?;
             
             // Add logging functions as module functions
             game_module.add_function(wrap_pyfunction!(py_log, &game_module)?)?;
@@ -29,12 +30,14 @@ impl PythonScriptEngine {
             game_module.add_function(wrap_pyfunction!(py_error, &game_module)?)?;
             
             // Add to sys.modules so it can be imported
-            let sys = PyModule::import_bound(py, "sys")?;
+            let sys = PyModule::import(py, "sys")?;
             let sys_modules = sys.getattr("modules")?;
             sys_modules.set_item("game", game_module)?;
             
             // Execute the script
-            py.run_bound(script, None, None)?;
+            // Convert the script to a CString for the new PyO3 API
+            let code_cstr = CString::new(script).map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Script contains null byte: {}", e)))?;
+            py.run(code_cstr.as_c_str(), None, None)?;
             Ok::<(), PyErr>(())
         })?;
         
@@ -49,8 +52,8 @@ impl PythonScriptEngine {
     
     /// Import and execute Python module
     pub fn import_module(&self, name: &str) -> anyhow::Result<()> {
-        Python::with_gil(|py| {
-            let _module = PyModule::import_bound(py, name)?;
+        Python::attach(|py| {
+            let _module = PyModule::import(py, name)?;
             Ok::<(), PyErr>(())
         })?;
         Ok(())
