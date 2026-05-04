@@ -18,7 +18,7 @@ LevelEvent.Load                  → WorldLoaded
 
 ## Initialisation
 
-NeoForge compatibility initialises alongside Forge at application startup:
+NeoForge compatibility initializes alongside Forge at application startup:
 
 ```rust
 let neoforge = NeoforgeCompatLayer::new(
@@ -36,7 +36,7 @@ NeoForge mods are JAR files. Place them in `mods/`:
 cp my-neoforge-mod-1.0.0.jar mods/
 ```
 
-The loader detects and initialises them just like regular JAR mods. See [JAR Mods](/modding/jar) for setup requirements.
+The loader detects and initializes them just like regular JAR mods. See [JAR Mods](/modding/jar) for setup requirements.
 
 ## Differences from Forge Compatibility
 

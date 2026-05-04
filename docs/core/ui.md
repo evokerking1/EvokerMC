@@ -72,7 +72,7 @@ The settings screen currently exposes:
 
 | Setting | Default | Range |
 |---------|---------|-------|
-| Render distance | 16 chunks | 2 – 32 |
+| Render distance | 16 chunks | 2 - 32 |
 | VSync | enabled | on/off |
 | Master volume | 0.8 | 0 – 1 |
 

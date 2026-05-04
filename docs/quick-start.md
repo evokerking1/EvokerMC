@@ -18,10 +18,10 @@ cargo run --release
 
 On startup the engine:
 
-1. Initialises the logging system.
+1. Initializes the logging system.
 2. Loads the configuration from `config.json` (created on first run with defaults).
 3. Scans the `mods/` directory and loads any discovered mods.
-4. Initialises Forge/Neoforge compatibility layers.
+4. Initializes Forge/Neoforge compatibility layers.
 5. Opens the main menu, ready for singleplayer or multiplayer.
 
 ## 3. Start a Singleplayer World

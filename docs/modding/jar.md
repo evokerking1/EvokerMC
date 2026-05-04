@@ -20,9 +20,9 @@ public class MyMod {
         System.out.println("MyMod constructor called");
     }
 
-    /** Called by EvokerMC when the mod is initialised. */
+    /** Called by EvokerMC when the mod is initialized. */
     public void init() {
-        System.out.println("MyMod initialised!");
+        System.out.println("MyMod initialized!");
     }
 
     /** Called every game tick. */
@@ -82,7 +82,7 @@ For engine contributors and advanced use cases:
 use evoker_modding::{JarModLoader, JvmManager};
 use std::path::Path;
 
-// Initialise the loader
+// Initialize the loader
 let mut loader = JarModLoader::new();
 
 // Load a single JAR

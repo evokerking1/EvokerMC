@@ -18,7 +18,7 @@ WorldLoadEvent       →  WorldLoaded
 
 ## Initialisation
 
-Forge compatibility is initialised automatically when the application starts:
+Forge compatibility is initialized automatically when the application starts:
 
 ```rust
 let forge = ForgeCompatLayer::new(
@@ -28,7 +28,7 @@ let forge = ForgeCompatLayer::new(
 forge.init().await?;
 ```
 
-After initialisation, any Forge mod that subscribes to the mapped events will receive the corresponding EvokerMC events.
+After initialization, any Forge mod that subscribes to the mapped events will receive the corresponding EvokerMC events.
 
 ## Supported Forge Versions
 

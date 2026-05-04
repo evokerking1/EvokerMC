@@ -46,7 +46,7 @@ public class HelloMod {
     public HelloMod() {}
 
     public void init() {
-        System.out.println("HelloMod initialised!");
+        System.out.println("HelloMod initialized!");
     }
 }
 ```

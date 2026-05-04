@@ -21,7 +21,7 @@ pub struct WorldInfo {
 
 ### `Chunk`
 
-Chunks are 16 × 256 × 16 blocks. They are the unit of loading and saving.
+Chunks are 16 x 256 x 16 blocks. They are the unit of loading and saving.
 
 ### `ChunkCoord`
 

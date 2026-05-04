@@ -16,7 +16,7 @@ EvokerMC supports mods compiled to [WebAssembly](https://webassembly.org/) (WASM
 // src/lib.rs
 #[no_mangle]
 pub extern "C" fn init() {
-    // Mod initialisation logic
+    // Mod initialization logic
 }
 
 #[no_mangle]
