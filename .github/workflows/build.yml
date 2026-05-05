@@ -2,9 +2,9 @@ name: Build and Test
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, Master ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, Master ]
   workflow_dispatch: 
 
 env:
@@ -89,6 +89,23 @@ jobs:
         toolchain: stable
         target: ${{ matrix.target }}
         override: true
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Cache cargo index
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/git
+        key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Cache target directory
+      uses: actions/cache@v4
+      with:
+        path: target
+        key: ${{ runner.os }}-cargo-target-${{ hashFiles('**/Cargo.lock') }}
     
     - name: Build release
       run: cargo build --release --target ${{ matrix.target }}
