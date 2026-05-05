@@ -258,8 +258,8 @@ impl App {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    // Initialize logging
-    env_logger::init();
+    // Initialize logging, disabled due to being problematic
+    // env_logger::init();
     
     // Create and run application
     let mut app = App::new().await?;

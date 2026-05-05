@@ -16,7 +16,7 @@ pub type Result<T> = anyhow::Result<T>;
 
 /// Core engine initialization
 pub async fn init() -> Result<()> {
-    env_logger::init();
+    //env_logger::init();
     log::info!("EvokerMC Core Engine initialized");
     Ok(())
 }
