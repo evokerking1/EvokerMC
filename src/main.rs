@@ -61,19 +61,19 @@ impl App {
         let config = Config::default();
         
         // Create event bus
-        let event_bus = Arc::new(EventBus::new());
+        let event_bus: Arc<EventBus> = Arc::new(EventBus::new());
         
         // Create game instance
-        let game = Arc::new(Game::new(event_bus.clone()));
+        let game: Arc<Game> = Arc::new(Game::new(event_bus.clone()));
         
         // Initialize mod loader
-        let mod_loader = Arc::new(ModLoader::new(
+        let mod_loader: Arc<ModLoader> = Arc::new(ModLoader::new(
             config.mods.mods_dir.clone(),
             event_bus.clone(),
         )?);
         
         // Initialize asset manager
-        let asset_manager = Arc::new(AssetManager::new(
+        let asset_manager: Arc<AssetManager> = Arc::new(AssetManager::new(
             PathBuf::from("assets"),
             event_bus.clone(),
         )?);
@@ -249,7 +249,8 @@ impl App {
         // - Render frames
         // - Process input
         // - Update game state
-        
+
+        println!("EvokerMc Initialized and ready");
         log::info!("EvokerMC initialized and ready");
         
         Ok(())
